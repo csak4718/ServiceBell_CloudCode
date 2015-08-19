@@ -17,6 +17,50 @@ function sendDoneNotification(seller) {
     });
 }
 
+Parse.Cloud.define("createChatConnection", function(request, response) {
+    Parse.Cloud.useMasterKey();
+    var senderId = request.params.senderId;
+    var recipientId = request.params.recipientId;
+
+    var senderQuery = new Parse.Query(Parse.User);
+    senderQuery.get(senderId, {
+        success: function(sender) {
+            var recipientQuery = new Parse.Query(Parse.User);
+            recipientQuery.get(recipientId, {
+                success: function(recipient) {
+                    // Now we have both sender and recipient
+                    var senderFriends = sender.relation("friends");
+                    var recipientFriends = recipient.relation("friends");
+                    senderFriends.add(recipient);
+                    recipientFriends.add(sender);
+
+                    sender.save(null, {
+                      success: function(buyer) {
+                          console.log("save success");
+                      },
+                      error: function(buyer, error) {
+                          console.log("ERROR");
+                      }
+                    });
+
+                    recipient.save(null, {
+                      success: function(buyer) {
+                          console.log("save success");
+                      },
+                      error: function(buyer, error) {
+                          console.log("ERROR");
+                      }
+                    });
+
+                } // successfully get recipient
+            });
+        } // successfully get sender
+
+    });
+
+});
+
+
 Parse.Cloud.define("doneTask", function(request, response) {
     Parse.Cloud.useMasterKey();
     var taskId = request.params.taskId;
