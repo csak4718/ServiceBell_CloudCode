@@ -60,6 +60,23 @@ Parse.Cloud.define("createChatConnection", function(request, response) {
 
 });
 
+Parse.Cloud.define("notifySellerAccept", function(request, response) {
+    var buyerId = request.params.buyerId;
+    var buyerQuery = new Parse.Query(Parse.User);
+    buyerQuery.get(buyerId, {
+        success: function(buyer) {
+            var pushQuery = new Parse.Query(Parse.Installation);
+            pushQuery.equalTo("user", buyer);
+            Parse.Push.send({
+                where: pushQuery,
+                data: {
+                    title: "有人接受你的任務囉～",
+                    alert: "有人接受你發的任務囉～～快去看看吧～～"
+                }
+            });
+        }
+    });
+});
 
 Parse.Cloud.define("doneTask", function(request, response) {
     Parse.Cloud.useMasterKey();
