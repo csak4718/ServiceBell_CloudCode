@@ -55,6 +55,9 @@ Parse.Cloud.define("doneTask", function(request, response) {
                     sellerDoneQuestions.add(task);
                     seller.save();
                     sendDoneNotification(seller);
+
+                    task.set("doneUser", seller);
+                    task.save();
                 }
             });
             // delete other seller accepted question
@@ -63,13 +66,14 @@ Parse.Cloud.define("doneTask", function(request, response) {
             userQuery.find({
                 success: function(users) {
                     for (var i = 0; i < users.length; i++) {
-                        var user = users[i];
+                        var seller = users[i];
                         var sellerAcceptedQuestions = seller.relation("acceptedQuestions");
                         sellerAcceptedQuestions.remove(task);
                         seller.save();
 
-                        acceptedUser.remove(user);
+                        acceptedUser.remove(seller);
                     }
+                    task.save();
                 }
             });
         },
