@@ -17,6 +17,18 @@ function sendDoneNotification(seller) {
     });
 }
 
+function sendIMNotification(recipient) {
+    var pushQuery = new Parse.Query(Parse.Installation);
+    pushQuery.equalTo("user", recipient);
+    Parse.Push.send({
+        where: pushQuery,
+        data: {
+            title: "IM",
+            alert: "有人IM你～"
+        }
+    });
+}
+
 Parse.Cloud.define("createChatConnection", function(request, response) {
     Parse.Cloud.useMasterKey();
     var senderId = request.params.senderId;
@@ -188,4 +200,16 @@ Parse.Cloud.afterSave("Question", function(request) {
             }
         });
     }
+});
+
+Parse.Cloud.define("instantMessageNotification", function(request, response) {
+  Parse.Cloud.useMasterKey();
+  var recipientId = request.params.recipientId;
+
+  var recipientQuery = new Parse.Query(Parse.User);
+  recipientQuery.get(recipientId, {
+      success: function(recipient) {
+          sendIMNotification(recipient);
+      }
+  });
 });
