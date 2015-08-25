@@ -217,7 +217,7 @@ function sendIMNotification(sender, recipient, senderId) {
         where: pushQuery,
         data: {
             title: sender.get("nickname"),
-            uri: "nest://IMNotifSender/" + senderId,
+            // uri: "nest://IMNotifSender/" + senderId,
             alert: "Message Content"
         }
     }, {
