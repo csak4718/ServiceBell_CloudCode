@@ -17,18 +17,6 @@ function sendDoneNotification(seller) {
     });
 }
 
-function sendIMNotification(recipient) {
-    var pushQuery = new Parse.Query(Parse.Installation);
-    pushQuery.equalTo("user", recipient);
-    Parse.Push.send({
-        where: pushQuery,
-        data: {
-            title: "IM",
-            alert: "有人IM你～"
-        }
-    });
-}
-
 Parse.Cloud.define("createChatConnection", function(request, response) {
     Parse.Cloud.useMasterKey();
     var senderId = request.params.senderId;
@@ -204,12 +192,39 @@ Parse.Cloud.afterSave("Question", function(request) {
 
 Parse.Cloud.define("instantMessageNotification", function(request, response) {
   Parse.Cloud.useMasterKey();
+  var senderId = request.params.senderId;
   var recipientId = request.params.recipientId;
 
-  var recipientQuery = new Parse.Query(Parse.User);
-  recipientQuery.get(recipientId, {
-      success: function(recipient) {
-          sendIMNotification(recipient);
-      }
+  var senderQuery = new Parse.Query(Parse.User);
+  senderQuery.get(senderId, {
+    success: function(sender){
+        var recipientQuery = new Parse.Query(Parse.User);
+        recipientQuery.get(recipientId, {
+            success: function(recipient) {
+                sendIMNotification(sender, recipient);
+            }
+        });
+    }
   });
+
 });
+
+function sendIMNotification(sender, recipient) {
+    var pushQuery = new Parse.Query(Parse.Installation);
+    pushQuery.equalTo("user", recipient);
+    pushQuery.equalTo("inMessagingActivity", true);
+    Parse.Push.send({
+        where: pushQuery,
+        data: {
+            title: sender.get("nickname"),
+            alert: "Message Content"
+        }
+    }, {
+      success: function() {
+        // Push was successful
+      },
+      error: function(error) {
+        // Handle error
+      }
+    });
+}
