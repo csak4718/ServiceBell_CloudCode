@@ -201,7 +201,7 @@ Parse.Cloud.define("instantMessageNotification", function(request, response) {
         var recipientQuery = new Parse.Query(Parse.User);
         recipientQuery.get(recipientId, {
             success: function(recipient) {
-                sendIMNotification(sender, recipient);
+                sendIMNotification(sender, recipient, senderId);
             }
         });
     }
@@ -209,7 +209,7 @@ Parse.Cloud.define("instantMessageNotification", function(request, response) {
 
 });
 
-function sendIMNotification(sender, recipient) {
+function sendIMNotification(sender, recipient, senderId) {
     var pushQuery = new Parse.Query(Parse.Installation);
     pushQuery.equalTo("user", recipient);
     pushQuery.equalTo("inMessagingActivity", false);
@@ -217,6 +217,7 @@ function sendIMNotification(sender, recipient) {
         where: pushQuery,
         data: {
             title: sender.get("nickname"),
+            uri: "nest://IMNotifSender/" + senderId,
             alert: "Message Content"
         }
     }, {
