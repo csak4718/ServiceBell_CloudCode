@@ -212,7 +212,7 @@ Parse.Cloud.define("instantMessageNotification", function(request, response) {
 function sendIMNotification(sender, recipient) {
     var pushQuery = new Parse.Query(Parse.Installation);
     pushQuery.equalTo("user", recipient);
-    pushQuery.equalTo("inMessagingActivity", true);
+    pushQuery.equalTo("inMessagingActivity", false);
     Parse.Push.send({
         where: pushQuery,
         data: {
