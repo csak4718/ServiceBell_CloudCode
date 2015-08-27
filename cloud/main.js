@@ -5,18 +5,6 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world!");
 });
 
-function sendDoneNotification(seller) {
-    var pushQuery = new Parse.Query(Parse.Installation);
-    pushQuery.equalTo("user", seller);
-    Parse.Push.send({
-        where: pushQuery,
-        data: {
-            title: "任務成交",
-            alert: "恭喜你的任務成交囉～快去看看吧～"
-        }
-    });
-}
-
 Parse.Cloud.define("createChatConnection", function(request, response) {
     Parse.Cloud.useMasterKey();
     var senderId = request.params.senderId;
@@ -59,6 +47,18 @@ Parse.Cloud.define("createChatConnection", function(request, response) {
     });
 
 });
+
+function sendDoneNotification(seller) {
+    var pushQuery = new Parse.Query(Parse.Installation);
+    pushQuery.equalTo("user", seller);
+    Parse.Push.send({
+        where: pushQuery,
+        data: {
+            title: "任務成交",
+            alert: "恭喜你的任務成交囉～快去看看吧～"
+        }
+    });
+}
 
 Parse.Cloud.define("notifySellerAccept", function(request, response) {
     var buyerId = request.params.buyerId;
