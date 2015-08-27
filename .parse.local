@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "Nest": {
+      "applicationId": "7daNmGHwHg9PHbM8lfVQhJtvHlnz59CFU55VGZqf"
+    },
+    "_default": {
+      "link": "Nest"
+    }
+  }
+}

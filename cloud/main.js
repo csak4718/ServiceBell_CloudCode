@@ -5,6 +5,28 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world!");
 });
 
+Parse.Cloud.define("updateRating", function(request, response){
+    Parse.Cloud.useMasterKey();
+    var buyerId = request.params.buyerId;
+    var rating = request.params.rating;
+    var votenum = request.params.votenum;
+    var buyerQuery = new Parse.Query(Parse.User);
+    buyerQuery.get(buyerId, {
+        success: function(buyer) {
+            buyer.set("rating",rating);
+            buyer.set("votenum",votenum);
+            buyer.save(null,{
+                success: function(buyer) {
+                    console.log("save success");
+                },
+                error: function(buyer, error) {
+                    console.log("ERROR");
+                }
+            });
+        }
+    });
+});
+
 Parse.Cloud.define("createChatConnection", function(request, response) {
     Parse.Cloud.useMasterKey();
     var senderId = request.params.senderId;
@@ -54,6 +76,7 @@ function sendDoneNotification(seller) {
     Parse.Push.send({
         where: pushQuery,
         data: {
+            uri: "nest://seller/done",
             title: "任務成交",
             alert: "恭喜你的任務成交囉～快去看看吧～"
         }
@@ -70,6 +93,7 @@ Parse.Cloud.define("notifySellerAccept", function(request, response) {
             Parse.Push.send({
                 where: pushQuery,
                 data: {
+                    uri: "nest://buyer/new",
                     title: "有人接受你的任務囉～",
                     alert: "有人接受你發的任務囉～～快去看看吧～～"
                 }
@@ -180,6 +204,7 @@ Parse.Cloud.afterSave("Question", function(request) {
                     Parse.Push.send({
                         where: pushQuery,
                         data: {
+                            uri: "nest://seller/new",
                             title: "發任務囉～",
                             alert: "你接到新任務囉～～快去看看吧～～"
                         }
