@@ -85,6 +85,7 @@ function sendDoneNotification(seller) {
 
 Parse.Cloud.define("notifySellerAccept", function(request, response) {
     var buyerId = request.params.buyerId;
+    var senderName = request.params.senderName;
     var buyerQuery = new Parse.Query(Parse.User);
     buyerQuery.get(buyerId, {
         success: function(buyer) {
@@ -94,8 +95,8 @@ Parse.Cloud.define("notifySellerAccept", function(request, response) {
                 where: pushQuery,
                 data: {
                     uri: "nest://buyer/new",
-                    title: "有人接受你的任務囉～",
-                    alert: "有人接受你發的任務囉～～快去看看吧～～"
+                    title: senderName + "接受你的任務囉～",
+                    alert: senderName + "接受你發的任務囉～～快去看看吧～～"
                 }
             });
         }
@@ -241,6 +242,7 @@ function sendIMNotification(sender, recipient, senderId) {
     Parse.Push.send({
         where: pushQuery,
         data: {
+            uri: "nest://im/" + senderId,
             title: sender.get("nickname"),
             // uri: "nest://IMNotifSender/" + senderId,
             alert: "Message Content"
