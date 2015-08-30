@@ -246,7 +246,7 @@ function sendIMNotification(sender, recipient, senderId, isPicture, textMessage)
           where: pushQuery,
           data: {
               title: sender.get("nickname"),
-              // uri: "nest://IMNotifSender/" + senderId,
+              uri: "nest://im/" + senderId,
               alert: "傳了一張圖片給你"
           }
       }, {
@@ -264,7 +264,6 @@ function sendIMNotification(sender, recipient, senderId, isPicture, textMessage)
         data: {
             uri: "nest://im/" + senderId,
             title: sender.get("nickname"),
-            // uri: "nest://IMNotifSender/" + senderId,
             alert: textMessage
         }
     }, {
