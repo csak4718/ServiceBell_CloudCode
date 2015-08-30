@@ -220,6 +220,8 @@ Parse.Cloud.define("instantMessageNotification", function(request, response) {
   Parse.Cloud.useMasterKey();
   var senderId = request.params.senderId;
   var recipientId = request.params.recipientId;
+  var isPicture = request.params.isPicture;
+  var textMessage = request.params.textMessage;
 
   var senderQuery = new Parse.Query(Parse.User);
   senderQuery.get(senderId, {
@@ -227,7 +229,7 @@ Parse.Cloud.define("instantMessageNotification", function(request, response) {
         var recipientQuery = new Parse.Query(Parse.User);
         recipientQuery.get(recipientId, {
             success: function(recipient) {
-                sendIMNotification(sender, recipient, senderId);
+                sendIMNotification(sender, recipient, senderId, isPicture, textMessage);
             }
         });
     }
@@ -235,17 +237,35 @@ Parse.Cloud.define("instantMessageNotification", function(request, response) {
 
 });
 
-function sendIMNotification(sender, recipient, senderId) {
+function sendIMNotification(sender, recipient, senderId, isPicture, textMessage) {
     var pushQuery = new Parse.Query(Parse.Installation);
     pushQuery.equalTo("user", recipient);
     pushQuery.equalTo("inMessagingActivity", false);
+    if (isPicture){
+      Parse.Push.send({
+          where: pushQuery,
+          data: {
+              title: sender.get("nickname"),
+              // uri: "nest://IMNotifSender/" + senderId,
+              alert: "傳了一張圖片給你"
+          }
+      }, {
+        success: function() {
+          // Push was successful
+        },
+        error: function(error) {
+          // Handle error
+        }
+      });
+  }
+  else{
     Parse.Push.send({
         where: pushQuery,
         data: {
             uri: "nest://im/" + senderId,
             title: sender.get("nickname"),
             // uri: "nest://IMNotifSender/" + senderId,
-            alert: "Message Content"
+            alert: textMessage
         }
     }, {
       success: function() {
@@ -255,4 +275,5 @@ function sendIMNotification(sender, recipient, senderId) {
         // Handle error
       }
     });
+  }
 }
